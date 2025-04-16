@@ -1,4 +1,7 @@
 import {
+  AfterLoad,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -6,51 +9,48 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { ICryptage } from "../cryptage/ICryptage";
+import { decrypt, encrypt } from "../cryptage/Cryptage";
 
 @Entity("talentapprenant")
 export class TalentApprenant {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn('varchar')
   keycloakId!: string;
 
-  @Column({ type: "jsonb", nullable: false })
-  nom!: ICryptage;
+  @Column({ type: "varchar", nullable: false })
+  nom!: string;
 
-  @Column({ type: "jsonb", nullable: false })
-  prenom!: ICryptage;
+  @Column({ type: "varchar", nullable: false })
+  prenom!: string;
 
-  @Column({ type: "jsonb", nullable: false })
-  date_naissance!: ICryptage;
+  @Column({ type: "varchar", nullable: false })
+  date_naissance!: string;
 
-  @Column({ type: "jsonb", nullable: false })
-  telephone!: ICryptage;
+  @Column({ type: "varchar", nullable: false })
+  telephone!: string;
 
-  @Column({ type: "jsonb", nullable: false })
-  ville!: ICryptage;
+  @Column({ type: "varchar", nullable: false })
+  ville!: string;
 
-  @Column({ type: "jsonb", nullable: false })
-  niveau_etude!: ICryptage;
+  @Column({ type: "varchar", nullable: false })
+  niveau_etude!: string;
 
-  @Column({ type: "jsonb", nullable: false })
-  specialite!: ICryptage;
+  @Column({ type: "varchar", nullable: false })
+  specialite!: string;
 
-  @Column({ type: "jsonb", nullable: true })
-  cv?: ICryptage | null;
+  @Column({ type: "varchar", nullable: true })
+  cv?: string | null;
 
-  @Column({ type: "jsonb", nullable: true })
-  photo?: ICryptage | null;
+  @Column({ type: "varchar", nullable: true })
+  photo?: string | null;
 
-  @Column({ type: "jsonb", nullable: false })
-  presentation!: ICryptage;
+  @Column({ type: "varchar", nullable: false })
+  presentation!: string;
 
-  @Column({ type: "jsonb", nullable: true })
-  linkedin?: ICryptage;
+  @Column({ type: "varchar", nullable: true })
+  linkedin?: string;
 
-  @Column({ type: "jsonb", nullable: true })
-  portfolio?: ICryptage;
-
-  // @Column("simple-array", { nullable: false })
-  // objectives!: string[];
+  @Column({ type: "varchar", nullable: true })
+  portfolio?: string;
 
   @Column({type: "boolean", nullable: false, default: true})
   partage!: boolean;
@@ -67,4 +67,115 @@ export class TalentApprenant {
 
   @DeleteDateColumn({ type: "timestamp", nullable: true })
   deleted_at!: Date | null;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  encryptFields() {
+    if (this.keycloakId) {
+      this.keycloakId = encrypt(this.keycloakId);
+    }
+
+    if (this.nom) {
+      this.nom = encrypt(this.nom);
+    }
+
+    if (this.prenom) {
+      this.prenom = encrypt(this.prenom);
+    }
+
+    if (this.date_naissance) {
+      this.date_naissance = encrypt(this.date_naissance);
+    }
+
+    if (this.telephone) {
+      this.telephone = encrypt(this.telephone);
+    }
+
+    if (this.ville) {
+      this.ville = encrypt(this.ville);
+    }
+
+    if (this.niveau_etude) {
+      this.niveau_etude = encrypt(this.niveau_etude);
+    }
+
+    if (this.specialite) {
+      this.specialite = encrypt(this.specialite);
+    }
+
+    if (this.cv) {
+      this.cv = encrypt(this.cv);
+    }
+
+    if (this.photo) {
+      this.photo = encrypt(this.photo);
+    }
+
+    if (this.presentation) {
+      this.presentation = encrypt(this.presentation);
+    }
+
+    if (this.linkedin) {
+      this.linkedin = encrypt(this.linkedin);
+    }
+
+    if (this.portfolio) {
+      this.portfolio = encrypt(this.portfolio);
+    }
+  }
+
+  @AfterLoad()
+  decryptFields() {
+    if (this.keycloakId) {
+      this.keycloakId = decrypt(this.keycloakId);
+    }
+
+    if (this.nom) {
+      this.nom = decrypt(this.nom);
+    }
+
+    if (this.prenom) {
+      this.prenom = decrypt(this.prenom);
+    }
+
+    if (this.date_naissance) {
+      this.date_naissance = decrypt(this.date_naissance);
+    }
+
+    if (this.telephone) {
+      this.telephone = decrypt(this.telephone);
+    }
+
+    if (this.ville) {
+      this.ville = decrypt(this.ville);
+    }
+
+    if (this.niveau_etude) {
+      this.niveau_etude = decrypt(this.niveau_etude);
+    }
+
+    if (this.specialite) {
+      this.specialite = decrypt(this.specialite);
+    }
+    
+    if (this.cv) {
+      this.cv = decrypt(this.cv);
+    }
+
+    if (this.photo) {
+      this.photo = decrypt(this.photo);
+    }
+
+    if (this.presentation) {
+      this.presentation = decrypt(this.presentation);
+    }
+
+    if (this.linkedin) {
+      this.linkedin = decrypt(this.linkedin);
+    }
+
+    if (this.portfolio) {
+      this.portfolio = decrypt(this.portfolio);
+    }
+  }
 }

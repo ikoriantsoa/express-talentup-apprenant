@@ -12,5 +12,4 @@ export interface ICreateApprenant {
   presentation: string;
   linkedin: string;
   portfolio: string;
-  //objectives: string[];
 }
