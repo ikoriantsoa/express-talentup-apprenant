@@ -1,12 +1,11 @@
 import { ApprenantService } from "../src/apprenant/ApprenantService";
 import { AppDataSource } from "../src/config/database";
 
-describe("ApprenantService - Tests unitaires", () => {
+describe("ApprenantService - Tests unitaires avec TalentApprenant", () => {
   let apprenantService: ApprenantService;
   let mockRepository: any;
-  let mockCryptageService: any;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     mockRepository = {
       create: jest.fn(),
       save: jest.fn(),
@@ -16,158 +15,117 @@ describe("ApprenantService - Tests unitaires", () => {
       softRemove: jest.fn(),
     };
 
-    mockCryptageService = {
-      encrypt: jest.fn((data: string) => `encrypted-${data}`),
-      decrypt: jest.fn((data: string) => data.replace("encrypted-", "")),
-    };
-
-    jest
-      .spyOn(AppDataSource, "getRepository")
-      .mockReturnValue(mockRepository as any);
+    jest.spyOn(AppDataSource, "getRepository").mockReturnValue(mockRepository);
     apprenantService = new ApprenantService();
-    (apprenantService as any).cryptageService = mockCryptageService;
   });
 
+  const messi = {
+    keycloakId: "uuid-keycloak",
+    nom: "Messi",
+    prenom: "Lionel",
+    date_naissance: "1987-06-24",
+    telephone: "+543412345678",
+    ville: "Rosario",
+    niveau_etude: "Licence",
+    specialite: "Football",
+    cv: "https://cv.messi.com",
+    photo: "https://photo.messi.com",
+    presentation: "GOAT du football",
+    linkedin: "https://linkedin.com/in/messi",
+    portfolio: "https://portfolio.messi.com",
+    partage: true,
+  };
+
+  const ronaldo = {
+    keycloakId: "uuid-ronaldo",
+    nom: "Ronaldo",
+    prenom: "Cristiano",
+    date_naissance: "1985-02-05",
+    telephone: "+351912345678",
+    ville: "Funchal",
+    niveau_etude: "Master",
+    specialite: "Football",
+    cv: null,
+    photo: null,
+    presentation: "Machine à buts",
+    linkedin: "https://linkedin.com/in/cr7",
+    portfolio: null,
+    partage: true,
+  };
+
   describe("createApprenant", () => {
-    it("Ce test doit crypter les données et créer un nouveau apprenant", async () => {
-      const newApprenant = {
-        keycloakId: "uuid-keycloak",
-        username: "leo-messi",
-        email: "leomessi@mail.com",
-        firstname: "Lionel",
-        lastname: "Messi",
-        adresse: "Rosario - Argentine",
+    it("doit créer un nouvel apprenant (Lionel Messi)", async () => {
+      const apprenantAvecMeta = {
+        ...messi,
+        created_at: new Date(),
+        updated_at: new Date(),
+        deleted_at: null,
       };
 
-      mockRepository.save.mockResolvedValue({
-        keycloakId: "uuid-keycloak",
-        username: "encrypted-leo-messi",
-        email: "encrypted-leomessi@mail.com",
-        firstname: "encrypted-Lionel",
-        lastname: "encrypted-Messi",
-        adresse: "encrypted-Rosario - Argentine",
-      });
+      mockRepository.create.mockReturnValue(messi);
+      mockRepository.save.mockResolvedValue(apprenantAvecMeta);
 
-      const result = await apprenantService.createApprenant(newApprenant);
+      const result = await apprenantService.createApprenant(messi);
 
-      
-      expect(mockCryptageService.encrypt).toHaveBeenCalledWith("leo-messi");
-      expect(mockCryptageService.encrypt).toHaveBeenCalledWith("leomessi@mail.com");
-      expect(mockCryptageService.encrypt).toHaveBeenCalledWith("Lionel");
-      expect(mockCryptageService.encrypt).toHaveBeenCalledWith("Messi");
-      expect(mockCryptageService.encrypt).toHaveBeenCalledWith("Rosario - Argentine");
-      
-      expect(mockRepository.create).toHaveBeenCalledWith({
-        keycloakId: "uuid-keycloak",
-        username: "encrypted-leo-messi",
-        email: "encrypted-leomessi@mail.com",
-        firstname: "encrypted-Lionel",
-        lastname: "encrypted-Messi",
-        adresse: "encrypted-Rosario - Argentine",
-      });
-
-      expect(result).toEqual({
-        keycloakId: "uuid-keycloak",
-        username: "encrypted-leo-messi",
-        email: "encrypted-leomessi@mail.com",
-        firstname: "encrypted-Lionel",
-        lastname: "encrypted-Messi",
-        adresse: "encrypted-Rosario - Argentine",
-      });
+      expect(mockRepository.create).toHaveBeenCalledWith(messi);
+      expect(mockRepository.save).toHaveBeenCalled();
+      expect(result).toMatchObject(messi);
     });
   });
 
   describe("getAllApprenant", () => {
-    it("Ce test doit décrypter tous les apprenants et retourne une liste", async () => {
-      const apprenantsCrypte = [
+    it("doit retourner une liste d'apprenants décryptés", async () => {
+      const apprenants = [
         {
-          keycloakId: "uuid-keycloak",
-          username: "encrypted-leo-messi",
-          email: "encrypted-leomessi@mail.com",
-          firstname: "encrypted-Lionel",
-          lastname: "encrypted-Messi",
-          adresse: "encrypted-Rosario - Argentine",
+          ...messi,
+          created_at: new Date(),
+          updated_at: new Date(),
+          deleted_at: null,
+        },
+        {
+          ...ronaldo,
+          created_at: new Date(),
+          updated_at: new Date(),
+          deleted_at: null,
         },
       ];
 
-      mockRepository.find.mockResolvedValue(apprenantsCrypte);
+      mockRepository.find.mockResolvedValue(apprenants);
 
       const result = await apprenantService.getAllApprenant();
 
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-leo-messi"
-      );
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-leomessi@mail.com"
-      );
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-Lionel"
-      );
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-Messi"
-      );
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-Rosario - Argentine"
-      );
-
-      expect(result).toEqual([
-        {
-            keycloakId: "uuid-keycloak",
-            username: "leo-messi",
-            email: "leomessi@mail.com",
-            firstname: "Lionel",
-            lastname: "Messi",
-            adresse: "Rosario - Argentine",
-          }
-      ]);
+      expect(mockRepository.find).toHaveBeenCalled();
+      expect(result).toHaveLength(2);
+      expect(result[0]).toMatchObject(messi);
+      expect(result[1]).toMatchObject(ronaldo);
     });
   });
 
   describe("getApprenantById", () => {
-    it("Ce test doit décrypter et retourner un utilisateur par son keycloakId", async () => {
-      const apprenantCrypte = {
-        keycloakId: "uuid-keycloak",
-        username: "encrypted-leo-messi",
-        email: "encrypted-leomessi@mail.com",
-        firstname: "encrypted-Lionel",
-        lastname: "encrypted-Messi",
-        adresse: "encrypted-Rosario - Argentine",
+    it("doit retourner un apprenant décrypté (Lionel Messi)", async () => {
+      const apprenant = {
+        ...messi,
+        created_at: new Date(),
+        updated_at: new Date(),
+        deleted_at: null,
       };
 
-      mockRepository.findOne.mockResolvedValue(apprenantCrypte);
+      mockRepository.findOne.mockResolvedValue(apprenant);
 
       const result = await apprenantService.getApprenantById("uuid-keycloak");
 
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-leo-messi"
-      );
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-leomessi@mail.com"
-      );
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-Lionel"
-      );
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-Messi"
-      );
-      expect(mockCryptageService.decrypt).toHaveBeenCalledWith(
-        "encrypted-Rosario - Argentine"
-      );
-
-      expect(result).toEqual({
-        keycloakId: "uuid-keycloak",
-        username: "leo-messi",
-        email: "leomessi@mail.com",
-        firstname: "Lionel",
-        lastname: "Messi",
-        adresse: "Rosario - Argentine",
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { keycloakId: "uuid-keycloak" },
       });
+      expect(result).toMatchObject(messi);
     });
 
-    it(`Ce test doit lever une erreur si l'apprenant n'existe pas`, async () => {
-        mockRepository.findOne.mockResolvedValue(null);
+    it("doit lever une erreur si l'apprenant n'existe pas", async () => {
+      mockRepository.findOne.mockResolvedValue(null);
 
-        await expect(apprenantService.getApprenantById('pas-messi')).rejects.toThrow("Apprenant non trouvé");
+      await expect(
+        apprenantService.getApprenantById("fake-id")
+      ).rejects.toThrow("Apprenant non trouvé");
     });
   });
 });
