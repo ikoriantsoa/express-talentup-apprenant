@@ -7,5 +7,7 @@ const webinaireController: WebinaireController = new WebinaireController();
 
 router.post('/createWebinaire', webinaireController.createWebinaire);
 router.get('/getWebinaire/:keycloakId/:webinaireId', webinaireController.getWebinaireById);
+router.get('/allWebinaire', webinaireController.getAllWebinaires);
+router.get('/recentWebinaire', webinaireController.getRecentWebinaires);
 
 export default router;

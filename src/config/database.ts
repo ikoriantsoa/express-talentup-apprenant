@@ -14,5 +14,6 @@ export const AppDataSource = new DataSource({
     database: config.db.database,
     synchronize: true,
     logging: true,
+    //dropSchema: true,
     entities: [TalentApprenant, TalentupWebinaire, TalentupWebinaireControle],
 });

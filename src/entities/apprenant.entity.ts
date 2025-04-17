@@ -6,10 +6,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { decrypt, encrypt } from "../cryptage/Cryptage";
+import { TalentupWebinaire } from "./webinaire.entity";
 
 @Entity("talentapprenant")
 export class TalentApprenant {
@@ -55,6 +57,9 @@ export class TalentApprenant {
   @Column({type: "boolean", nullable: false, default: true})
   partage!: boolean;
 
+  @OneToMany(() => TalentupWebinaire, (webinaire) => webinaire.apprenant)
+  webinaire!: TalentupWebinaire[];
+
   @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at!: Date;
 
@@ -71,10 +76,6 @@ export class TalentApprenant {
   @BeforeInsert()
   @BeforeUpdate()
   encryptFields() {
-    if (this.keycloakId) {
-      this.keycloakId = encrypt(this.keycloakId);
-    }
-
     if (this.nom) {
       this.nom = encrypt(this.nom);
     }
@@ -126,10 +127,6 @@ export class TalentApprenant {
 
   @AfterLoad()
   decryptFields() {
-    if (this.keycloakId) {
-      this.keycloakId = decrypt(this.keycloakId);
-    }
-
     if (this.nom) {
       this.nom = decrypt(this.nom);
     }
