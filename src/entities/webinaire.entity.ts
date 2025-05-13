@@ -21,6 +21,9 @@ export class TalentupWebinaire {
   @Column({ type: "varchar", nullable: false })
   titre!: string;
 
+  @Column({ type: "varchar", nullable: true })
+  description!: string;
+
   @Column({ type: "varchar", nullable: false, default: `test` })
   categorie!: string;
 
@@ -55,6 +58,9 @@ export class TalentupWebinaire {
     if (this.categorie) {
       this.categorie = encrypt(this.categorie);
     }
+    if (this.description) {
+      this.description = encrypt(this.description);
+    }
 
     if (this.image) {
       this.image = encrypt(this.image);
@@ -73,6 +79,10 @@ export class TalentupWebinaire {
 
     if (this.categorie) {
       this.categorie = decrypt(this.categorie);
+    }
+
+    if (this.description) {
+      this.description = decrypt(this.description);
     }
 
     if (this.image) {

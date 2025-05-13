@@ -1,4 +1,3 @@
-import { access } from "fs";
 import { AppDataSource } from "../config/database";
 import { TalentApprenant } from "../entities/apprenant.entity";
 import { TalentupWebinaireControle } from "../entities/controle-webinaire.entity";
@@ -7,6 +6,7 @@ import { TalentupWebinaire } from "../entities/webinaire.entity";
 interface ICreateWebinaire {
   keycloakId: string;
   titre: string;
+  description: string;
   categorie: string;
   type: string;
   niveau: string;
@@ -44,6 +44,7 @@ class WebinaireService {
 
     const webinaireNew = {
       titre: newWebinaire.titre,
+      description: newWebinaire.description,
       categorie: newWebinaire.categorie,
       image: newWebinaire.image,
       source: newWebinaire.source,
@@ -134,41 +135,50 @@ class WebinaireService {
   }
 
   public async getAllWebinaire() {
+    try {
+      const webinaires = await this.webinaireRepository.find({
+        where: { status: true },
+        relations: ["apprenant"],
+      });
+
+      console.log(webinaires);
+
+      const decryptWebinaire = webinaires.map((webinaire) => ({
+        webinaireId: webinaire.webinaireId,
+        titre: webinaire.titre,
+        description: webinaire.description,
+        categorie: webinaire.categorie,
+        image: webinaire.image,
+        source: webinaire.source,
+        apprenant: webinaire.apprenant,
+      }));
+
+      return { decryptWebinaire };
+    } catch (error) {
+      console.error("Erreur lors de la récupération des webinaires :", error);
+    }
+  }
+
+  public async getRecentWebinaire() {
     const webinaires = await this.webinaireRepository.find({
+      order: {
+        createdAt: "DESC",
+      },
+      take: 10,
       where: { status: true },
       relations: ["apprenant"],
     });
 
     const decryptWebinaire = webinaires.map((webinaire) => ({
       titre: webinaire.titre,
+      description: webinaire.description,
       categorie: webinaire.categorie,
       image: webinaire.image,
       source: webinaire.source,
       apprenant: webinaire.apprenant,
     }));
 
-    return decryptWebinaire;
-  }
-
-  public async getRecentWebinaire() {
-    const webinaires = await this.webinaireRepository.find({
-      order: {
-        createdAt: 'DESC',
-      },
-      take: 10,
-      where: {status: true},
-      relations: ["apprenant"],
-    });
-
-    const decryptWebinaire = webinaires.map((webinaire) => ({
-      titre: webinaire.titre,
-      categorie: webinaire.categorie,
-      image: webinaire.image,
-      source: webinaire.source,
-      apprenant: webinaire.apprenant,
-    }));
-
-    return decryptWebinaire;
+    return { decryptWebinaire };
   }
 }
 
