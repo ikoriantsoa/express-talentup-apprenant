@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import { ApprenantService } from "./ApprenantService";
-import { ICreateApprenant } from "./interfaces/IcreateApprenant";
 
 export class ApprenantController {
-
   public async getAllApprenant(req: Request, res: Response) {
     try {
       const apprenantService: ApprenantService = new ApprenantService();
@@ -36,36 +34,58 @@ export class ApprenantController {
   public async createApprenant(req: Request, res: Response): Promise<void> {
     try {
       const apprenant = req.body;
-      
+
       const apprenantService: ApprenantService = new ApprenantService();
-      
-      const result = await apprenantService.createApprenant(apprenant.apprenant);
-      console.log('result', result);
-      
+
+      const result = await apprenantService.createApprenant(
+        apprenant.apprenant
+      );
+      console.log("result", result);
+
       res.status(201).json(result);
       return;
     } catch (error: any) {
       res
         .status(500)
         .json({ error: "Erreur lors de la création de l'apprenant" });
-        console.log('error', error);
-        
+      console.log("error", error);
+
+      return;
+    }
+  }
+
+  public async deleteApprenant(req: Request, res: Response): Promise<void> {
+    try {
+      const { keycloakId } = req.params;
+
+      const apprenantService: ApprenantService = new ApprenantService();
+
+      await apprenantService.deleteApprenant(keycloakId);
+
+      res.status(204).json();
+      return;
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ error: "Erreur lors de la création de l'apprenant" });
+      console.log("error", error);
+
       return;
     }
   }
 
   // public async updateApprenant(req: Request, res: Response) {
-    
+
   //   try {
   //     const { keycloakId } = req.params;
   //     const { lastname, firstname, adresse } = req.body;
-  
+
   //     const apprenant = {
   //       lastname: lastname,
   //       firstname: firstname,
   //       adresse: adresse,
   //     };
-  
+
   //     const apprenantService: ApprenantService = new ApprenantService();
   //     const result = await apprenantService.updateApprenant(
   //       keycloakId,

@@ -1,11 +1,12 @@
 export interface ICreateApprenant {
   keycloakId: string;
+  email: string;
   nom: string;
   prenom: string;
   date_naissance: string;
   telephone: string;
   ville: string;
-  niveau_etude: string
+  niveau_etude: string;
   specialite: string;
   cv: string;
   photo: string;

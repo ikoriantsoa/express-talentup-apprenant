@@ -5,8 +5,9 @@ const router: Router = Router();
 
 const apprenantController: ApprenantController = new ApprenantController();
 
-router.get('/allApprenant', apprenantController.getAllApprenant);
-router.get('/apprenant/:keycloakId', apprenantController.getApprenantById);
-router.post('/createApprenant', apprenantController.createApprenant);
+router.get("/allApprenant", apprenantController.getAllApprenant);
+router.get("/apprenant/:keycloakId", apprenantController.getApprenantById);
+router.delete("/apprenant/:keycloakId", apprenantController.deleteApprenant);
+router.post("/createApprenant", apprenantController.createApprenant);
 
 export default router;

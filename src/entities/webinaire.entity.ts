@@ -33,7 +33,9 @@ export class TalentupWebinaire {
   @Column({ type: "boolean", nullable: false, default: false })
   status!: boolean;
 
-  @ManyToOne(() => TalentApprenant, (apprenant) => apprenant.webinaire)
+  @ManyToOne(() => TalentApprenant, (apprenant) => apprenant.webinaires, {
+    onDelete: "CASCADE",
+  })
   apprenant!: TalentApprenant;
 
   @CreateDateColumn({ type: "timestamp with time zone" })
@@ -48,39 +50,17 @@ export class TalentupWebinaire {
   @BeforeInsert()
   @BeforeUpdate()
   encryptFields() {
-    if (this.titre) {
-      this.titre = encrypt(this.titre);
-    }
-
-    if (this.categorie) {
-      this.categorie = encrypt(this.categorie);
-    }
-
-    if (this.image) {
-      this.image = encrypt(this.image);
-    }
-
-    if (this.source) {
-      this.source = encrypt(this.source);
-    }
+    if (this.titre) this.titre = encrypt(this.titre);
+    if (this.categorie) this.categorie = encrypt(this.categorie);
+    if (this.image) this.image = encrypt(this.image);
+    if (this.source) this.source = encrypt(this.source);
   }
 
   @AfterLoad()
   decryptFields() {
-    if (this.titre) {
-      this.titre = decrypt(this.titre);
-    }
-
-    if (this.categorie) {
-      this.categorie = decrypt(this.categorie);
-    }
-
-    if (this.image) {
-      this.image = decrypt(this.image);
-    }
-
-    if (this.source) {
-      this.source = decrypt(this.source);
-    }
+    if (this.titre) this.titre = decrypt(this.titre);
+    if (this.categorie) this.categorie = decrypt(this.categorie);
+    if (this.image) this.image = decrypt(this.image);
+    if (this.source) this.source = decrypt(this.source);
   }
 }

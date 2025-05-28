@@ -15,9 +15,12 @@ import { TalentupWebinaire } from "./webinaire.entity";
 
 @Entity("talentapprenant")
 export class TalentApprenant {
-  @PrimaryColumn('varchar')
+  @PrimaryColumn("varchar")
   keycloakId!: string;
 
+  @Column({ type: "varchar", nullable: false, unique: true })
+  email!: string;
+  
   @Column({ type: "varchar", nullable: false })
   nom!: string;
 
@@ -54,11 +57,13 @@ export class TalentApprenant {
   @Column({ type: "varchar", nullable: true })
   portfolio?: string;
 
-  @Column({type: "boolean", nullable: false, default: true})
+  @Column({ type: "boolean", nullable: false, default: true })
   partage!: boolean;
 
-  @OneToMany(() => TalentupWebinaire, (webinaire) => webinaire.apprenant)
-  webinaire!: TalentupWebinaire[];
+  @OneToMany(() => TalentupWebinaire, (webinaire) => webinaire.apprenant, {
+    cascade: ["remove"],
+  })
+  webinaires!: TalentupWebinaire[];
 
   @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   created_at!: Date;
@@ -76,103 +81,35 @@ export class TalentApprenant {
   @BeforeInsert()
   @BeforeUpdate()
   encryptFields() {
-    if (this.nom) {
-      this.nom = encrypt(this.nom);
-    }
-
-    if (this.prenom) {
-      this.prenom = encrypt(this.prenom);
-    }
-
-    if (this.date_naissance) {
-      this.date_naissance = encrypt(this.date_naissance);
-    }
-
-    if (this.telephone) {
-      this.telephone = encrypt(this.telephone);
-    }
-
-    if (this.ville) {
-      this.ville = encrypt(this.ville);
-    }
-
-    if (this.niveau_etude) {
-      this.niveau_etude = encrypt(this.niveau_etude);
-    }
-
-    if (this.specialite) {
-      this.specialite = encrypt(this.specialite);
-    }
-
-    if (this.cv) {
-      this.cv = encrypt(this.cv);
-    }
-
-    if (this.photo) {
-      this.photo = encrypt(this.photo);
-    }
-
-    if (this.presentation) {
-      this.presentation = encrypt(this.presentation);
-    }
-
-    if (this.linkedin) {
-      this.linkedin = encrypt(this.linkedin);
-    }
-
-    if (this.portfolio) {
-      this.portfolio = encrypt(this.portfolio);
-    }
+    if (this.nom) this.nom = encrypt(this.nom);
+    if (this.prenom) this.prenom = encrypt(this.prenom);
+    if (this.date_naissance) this.date_naissance = encrypt(this.date_naissance);
+    if (this.telephone) this.telephone = encrypt(this.telephone);
+    if (this.ville) this.ville = encrypt(this.ville);
+    if (this.niveau_etude) this.niveau_etude = encrypt(this.niveau_etude);
+    if (this.specialite) this.specialite = encrypt(this.specialite);
+    if (this.cv) this.cv = encrypt(this.cv);
+    if (this.photo) this.photo = encrypt(this.photo);
+    if (this.presentation) this.presentation = encrypt(this.presentation);
+    if (this.linkedin) this.linkedin = encrypt(this.linkedin);
+    if (this.portfolio) this.portfolio = encrypt(this.portfolio);
+    if (this.email) this.email = encrypt(this.email);
   }
 
   @AfterLoad()
   decryptFields() {
-    if (this.nom) {
-      this.nom = decrypt(this.nom);
-    }
-
-    if (this.prenom) {
-      this.prenom = decrypt(this.prenom);
-    }
-
-    if (this.date_naissance) {
-      this.date_naissance = decrypt(this.date_naissance);
-    }
-
-    if (this.telephone) {
-      this.telephone = decrypt(this.telephone);
-    }
-
-    if (this.ville) {
-      this.ville = decrypt(this.ville);
-    }
-
-    if (this.niveau_etude) {
-      this.niveau_etude = decrypt(this.niveau_etude);
-    }
-
-    if (this.specialite) {
-      this.specialite = decrypt(this.specialite);
-    }
-    
-    if (this.cv) {
-      this.cv = decrypt(this.cv);
-    }
-
-    if (this.photo) {
-      this.photo = decrypt(this.photo);
-    }
-
-    if (this.presentation) {
-      this.presentation = decrypt(this.presentation);
-    }
-
-    if (this.linkedin) {
-      this.linkedin = decrypt(this.linkedin);
-    }
-
-    if (this.portfolio) {
-      this.portfolio = decrypt(this.portfolio);
-    }
+    if (this.nom) this.nom = decrypt(this.nom);
+    if (this.prenom) this.prenom = decrypt(this.prenom);
+    if (this.date_naissance) this.date_naissance = decrypt(this.date_naissance);
+    if (this.telephone) this.telephone = decrypt(this.telephone);
+    if (this.ville) this.ville = decrypt(this.ville);
+    if (this.niveau_etude) this.niveau_etude = decrypt(this.niveau_etude);
+    if (this.specialite) this.specialite = decrypt(this.specialite);
+    if (this.cv) this.cv = decrypt(this.cv);
+    if (this.photo) this.photo = decrypt(this.photo);
+    if (this.presentation) this.presentation = decrypt(this.presentation);
+    if (this.linkedin) this.linkedin = decrypt(this.linkedin);
+    if (this.portfolio) this.portfolio = decrypt(this.portfolio);
+    if (this.email) this.email = decrypt(this.email);
   }
 }

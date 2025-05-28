@@ -8,6 +8,7 @@ export class ApprenantService {
   public async createApprenant(newApprenant: ICreateApprenant) {
     const cryptApprenant = {
       keycloakId: newApprenant.keycloakId,
+      email: newApprenant.email,
       nom: newApprenant.nom,
       prenom: newApprenant.prenom,
       date_naissance: newApprenant.date_naissance,
@@ -62,6 +63,7 @@ export class ApprenantService {
 
     return {
       keycloakId: apprenant.keycloakId,
+      email: apprenant.email,
       nom: apprenant.nom,
       prenom: apprenant.prenom,
       date_naissance: apprenant.date_naissance,
@@ -110,5 +112,17 @@ export class ApprenantService {
   //   return await this.apprenantRepository.save(apprenant);
   // }
 
-  public async deleteApprenant(id: number) {}
+  public async deleteApprenant(keycloakId: string){
+    // Vérification si l'apprenant existe
+    const existingApprenant = await this.apprenantRepository.findOne({
+      where: { keycloakId: keycloakId },
+    });
+
+    if (!existingApprenant) {
+      throw new Error("Apprenant non trouvé");
+    }
+
+    // Suppression de l'apprenant
+    await this.apprenantRepository.remove(existingApprenant);
+  }
 }
